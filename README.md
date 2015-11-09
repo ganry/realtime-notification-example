@@ -26,6 +26,6 @@ node app.js
 
 ## Contact
 
-You can find more angularjs examples on my homepage.
+You can find more angularjs and node examples on my homepage.
 
 http://www.henrykeller.eu
