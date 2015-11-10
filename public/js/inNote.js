@@ -1,8 +1,7 @@
 'use strict';
 
-
-angular.module('noteApp.inNote', []).
-    factory('inNoteFactory', function($rootScope, socketFactory) {
+angular.module('noteApp.inNote', [])
+.factory('inNoteFactory', function($rootScope, socketFactory) {
     var docElem = window.document.documentElement,
     support = { animations : Modernizr.cssanimations },
     animEndEventNames = {
@@ -47,8 +46,6 @@ angular.module('noteApp.inNote', []).
         layout : 'growl',
         // effects for the specified layout:
         // for growl layout: scale|slide|genie|jelly
-        // for attached layout: flip|bouncyflip
-        // for other layout: boxspinner|cornerexpand|loadingcircle|thumbslider
         // ...
         effect : 'slide',
         // notice, warning, error, success
@@ -68,7 +65,11 @@ angular.module('noteApp.inNote', []).
      */
     InNote.prototype._init = function() {
         // create HTML structure
-        this.ntf = $('<div>');//document.createElement( 'div' );
+        var lastNotification = $('.ns-box').last();
+        var top = lastNotification.length > 0 ? lastNotification.offset().top+lastNotification.outerHeight()+10 : 30;
+
+        this.ntf = $('<div>');
+        this.ntf.css('top', top);
         this.ntf.addClass('ns-box ns-' + this.options.layout + ' ns-effect-' + this.options.effect + ' ns-type-' + this.options.type);
         var strinner = '<div class="ns-box-inner">';
         strinner += this.options.message;
@@ -83,10 +84,8 @@ angular.module('noteApp.inNote', []).
         var self = this;
 
         if(this.options.ttl) { // checks to make sure ttl is not set to false in notification initialization
-            this.dismissttl = setTimeout( function() {
-                if( self.active ) {
+            setTimeout( function() {
                     self.dismiss();
-                }
             }, this.options.ttl );
         }
 
@@ -100,27 +99,41 @@ angular.module('noteApp.inNote', []).
     InNote.prototype._initEvents = function() {
         var self = this;
         // dismiss notification
-        this.ntf.find( '.ns-close' ).on( 'click', function() { self.dismiss(); } );
+        this.ntf.find( '.ns-close' ).on( 'click', function() {
+            self.dismiss($(this).parent('.ns-box'));
+        } );
     };
 
-    InNote.prototype.registerForMessage = function(messageType) {
+    /**
+     * Register for listening to custom event Type
+     * @param eventType Custom Event Type Clients listen to
+     * @param messageType One of the following notice, warning, error, success
+     */
+    InNote.prototype.registerForMessage = function(eventType, messageType) {
         var self = this;
 
-        socketFactory.on(messageType, function(data) {
+        socketFactory.on(eventType, function(data) {
             self.show(data, messageType);
         });
     };
 
-    InNote.prototype.sendMessageToAllClients = function(message, messageType) {
-        socketFactory.emit(messageType, message);
+    /**
+     * Send Message to all Clients
+     * @param message Message to send to clients
+     * @param eventType Custom Event Type Clients listen to
+     */
+    InNote.prototype.sendMessageToAllClients = function(message, eventType) {
+        socketFactory.emit(eventType, message);
     };
 
     /**
-     * show the notification
+     * Show Notification
+     * @param message Message to show
+     * @param messageType One of the following notice, warning, error, success
      */
-    InNote.prototype.show = function(message, type) {
+    InNote.prototype.show = function(message, messageType) {
         this.options.message = message;
-        this.options.type = type;
+        this.options.type = messageType;
         this._init();
 
         this.active = true;
@@ -133,15 +146,21 @@ angular.module('noteApp.inNote', []).
 
     /**
      * dismiss the notification
+     * @param notification notification Element you want to dismiss
      */
-    InNote.prototype.dismiss = function() {
+    InNote.prototype.dismiss = function(notification) {
+
+        if (typeof notification === 'undefined')
+            notification = $('.ns-box.ns-show').first();
+
+        if (notification.length == 0)
+            return;
 
         var self = this;
         this.active = false;
-        clearTimeout( this.dismissttl );
-        this.ntf.removeClass('ns-show');
+        notification.removeClass('ns-show');
         setTimeout( function() {
-            self.ntf.addClass('ns-hide');
+            notification.addClass('ns-hide');
 
             // callback
             if (typeof self.options.onClose === 'function')
@@ -151,15 +170,13 @@ angular.module('noteApp.inNote', []).
         // after animation ends remove ntf from the DOM
         var onEndAnimationFn = function( ev ) {
             if( support.animations ) {
-                //if( ev.target !== self.ntf ) return false;
-                self.ntf.off( animEndEventName, onEndAnimationFn );
+                notification.off( animEndEventName, onEndAnimationFn );
             }
-            self.ntf.remove();
-            //self.options.wrapper.remove( self.ntf );
+            notification.remove();
         };
 
         if( support.animations ) {
-            this.ntf.on( animEndEventName, onEndAnimationFn );
+            notification.on( animEndEventName, onEndAnimationFn );
         }
         else {
             onEndAnimationFn();

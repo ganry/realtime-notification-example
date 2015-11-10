@@ -1,6 +1,15 @@
-<h3>AngularJs View</h3>
 
-<div ng-bind="testValues"></div>
+<textarea class="form-control" rows="3" ng-model="testInput"></textarea><br />
 
-<input type="text" ng-model="testInput">
-<button ng-click="sendNotification()">Send Notification</button>
+
+<!-- Indicates a successful or positive action -->
+<button type="button" ng-click="sendSuccess()" class="btn btn-success">Send Success</button>
+
+<!-- Contextual button for informational alert messages -->
+<button type="button" ng-click="sendNotice()" class="btn btn-info">Send Notice</button>
+
+<!-- Indicates caution should be taken with this action -->
+<button type="button" ng-click="sendWarning()" class="btn btn-warning">Send Warning</button>
+
+<!-- Indicates a dangerous or potentially negative action -->
+<button type="button" ng-click="sendError()" class="btn btn-danger">Send Error</button>

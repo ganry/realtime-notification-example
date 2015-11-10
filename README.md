@@ -4,6 +4,8 @@ Simple Realtime Notification Example using Socket.io.
 
 Register for Notifications on Client Side and send Notifications from Client or Server side.
 
+![alt text](screen.jpg "Preview Screen")
+
 ## How to use it
 
 Clone this repository and run the following shell commands afterwards:
