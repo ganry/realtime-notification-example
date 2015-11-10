@@ -13,7 +13,7 @@ module.exports = function (io) {
 
             console.log('Got notice: ', value);
 
-            //send test to everyone except sender
+            //send notice to everyone except sender
             socket.broadcast.emit('noticeMessage', value);
         });
 
@@ -21,7 +21,7 @@ module.exports = function (io) {
 
             console.log('Got warning: ', value);
 
-            //send test to everyone except sender
+            //send warning to everyone except sender
             socket.broadcast.emit('warningMessage', value);
         });
 
@@ -29,7 +29,7 @@ module.exports = function (io) {
 
             console.log('Got error: ', value);
 
-            //send test to everyone except sender
+            //send error to everyone except sender
             socket.broadcast.emit('errorMessage', value);
         });
 
@@ -37,7 +37,7 @@ module.exports = function (io) {
 
             console.log('Got success: ', value);
 
-            //send test to everyone except sender
+            //send success to everyone except sender
             socket.broadcast.emit('successMessage', value);
         });
     });
