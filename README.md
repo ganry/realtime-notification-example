@@ -30,4 +30,4 @@ node app.js
 
 You can find more angularjs and node examples on my homepage.
 
-http://www.creativemind.info
+http://www.virtualgeek.eu
